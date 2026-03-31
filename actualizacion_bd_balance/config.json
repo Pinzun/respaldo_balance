@@ -1,0 +1,12 @@
+{
+  "fecha_inicio": "2025-10-01",
+  "fecha_fin": "2025-10-31",
+  "workers": 4,
+  "server_mode": "direct",
+  "dry_run": true,
+  "part1_exec": false,
+  "part2_exec": true,
+  "tipo": "Definitivo",
+  "download": false,
+  "carga": true
+}
