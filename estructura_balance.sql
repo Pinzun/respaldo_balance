@@ -75,20 +75,20 @@ DROP TABLE IF EXISTS `cmg`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `cmg` (
-  `IdVersion` int(11) NOT NULL,
-  `Hora_Mensual` int(11) NOT NULL,
+  `id_cmg` bigint(20) NOT NULL AUTO_INCREMENT,
+  `id_version` int(11) NOT NULL,
   `id_hora` bigint(20) DEFAULT NULL,
   `id_barra` int(11) NOT NULL,
   `CMG_PESO_KWH` float DEFAULT NULL,
   `CMG_DOLAR_MWH` float DEFAULT 0,
   `dolar` float DEFAULT 0,
-  PRIMARY KEY (`IdVersion`,`Hora_Mensual`,`id_barra`),
+  PRIMARY KEY (`id_cmg`),
   KEY `FK_cmg_barra` (`id_barra`) USING BTREE,
-  KEY `FK_cmg_version` (`IdVersion`) USING BTREE,
-  KEY `fk_cmg_hora` (`id_hora`),
+  KEY `FK_cmg_version` (`id_version`) USING BTREE,
+  KEY `idx_hora_barra` (`id_hora`,`id_barra`),
   CONSTRAINT `fk_cmg_hora` FOREIGN KEY (`id_hora`) REFERENCES `hora_mensual` (`id_hora`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_cmg_id_barra` FOREIGN KEY (`id_barra`) REFERENCES `barras` (`id_barra`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=107479007 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -215,10 +215,12 @@ DROP TABLE IF EXISTS `empresa`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `empresa` (
+  `id_empresa` int(11) NOT NULL AUTO_INCREMENT,
   `rut_empresa` varchar(13) NOT NULL,
   `nombre` text DEFAULT NULL,
-  PRIMARY KEY (`rut_empresa`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  PRIMARY KEY (`rut_empresa`),
+  UNIQUE KEY `id_empresa` (`id_empresa`)
+) ENGINE=InnoDB AUTO_INCREMENT=1047 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -244,7 +246,7 @@ CREATE TABLE `gx_real` (
   KEY `idx_real_real_central_hora` (`id_central`,`id_hora`),
   CONSTRAINT `fk_gx_real_centrales_new` FOREIGN KEY (`id_central`) REFERENCES `central` (`id_central`),
   CONSTRAINT `fk_gxreal_horamensual` FOREIGN KEY (`id_hora`) REFERENCES `hora_mensual` (`id_hora`)
-) ENGINE=InnoDB AUTO_INCREMENT=42401146 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=42348361 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -472,22 +474,24 @@ DROP TABLE IF EXISTS `retiro_regulado`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `retiro_regulado` (
-  `idversion` int(11) NOT NULL,
-  `idempresa_br` varchar(13) NOT NULL DEFAULT '',
-  `idempresa_sum` varchar(13) NOT NULL DEFAULT '',
+  `id_retiro_regulado` int(11) NOT NULL AUTO_INCREMENT,
+  `id_version` int(11) NOT NULL,
+  `bloque_regulado` varchar(10) DEFAULT NULL,
+  `idempresa_br` int(11) NOT NULL,
+  `idempresa_sum` int(11) NOT NULL,
   `kwh_ps1` float DEFAULT NULL,
   `%_ps1` float DEFAULT NULL,
   `kwh_ps2` float DEFAULT NULL,
   `%_ps2` float DEFAULT NULL,
   `fisico_kwh` float DEFAULT NULL,
   `monetario` float DEFAULT NULL,
-  PRIMARY KEY (`idversion`,`idempresa_br`,`idempresa_sum`),
+  PRIMARY KEY (`id_retiro_regulado`),
   KEY `FK_retiro_regulado_empresa_` (`idempresa_br`),
   KEY `FK_retiro_regulado_empresa__2` (`idempresa_sum`),
-  CONSTRAINT `FK_retiro_regulado_empresa_` FOREIGN KEY (`idempresa_br`) REFERENCES `empresa` (`rut_empresa`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `FK_retiro_regulado_empresa__2` FOREIGN KEY (`idempresa_sum`) REFERENCES `empresa` (`rut_empresa`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `retiro_regulado_ibfk_1` FOREIGN KEY (`idversion`) REFERENCES `version` (`id_version`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  CONSTRAINT `fk_retiro_regulado_br` FOREIGN KEY (`idempresa_br`) REFERENCES `empresa` (`id_empresa`),
+  CONSTRAINT `fk_retiro_regulado_sum` FOREIGN KEY (`idempresa_sum`) REFERENCES `empresa` (`id_empresa`),
+  CONSTRAINT `retiro_regulado_ibfk_1` FOREIGN KEY (`id_version`) REFERENCES `version` (`id_version`)
+) ENGINE=InnoDB AUTO_INCREMENT=131071 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -661,9 +665,13 @@ CREATE TABLE `version` (
   `periodo` date DEFAULT NULL,
   `tipo` varchar(255) DEFAULT NULL,
   `nombre` varchar(255) DEFAULT NULL,
+  `año` int(11) GENERATED ALWAYS AS (year(`periodo`)) STORED,
+  `mes` int(11) GENERATED ALWAYS AS (month(`periodo`)) STORED,
   PRIMARY KEY (`id_version`),
   UNIQUE KEY `uk_version` (`periodo`,`tipo`),
-  KEY `periodo` (`periodo`) USING BTREE
+  KEY `periodo` (`periodo`) USING BTREE,
+  KEY `idx_anio` (`año`),
+  KEY `idx_mes` (`mes`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -689,7 +697,7 @@ CREATE TABLE `vertimiento` (
   KEY `idx_id_hora` (`id_hora`),
   CONSTRAINT `fk_central` FOREIGN KEY (`id_central`) REFERENCES `central` (`id_central`),
   CONSTRAINT `fk_hora` FOREIGN KEY (`id_hora`) REFERENCES `hora_mensual` (`id_hora`)
-) ENGINE=InnoDB AUTO_INCREMENT=6422431 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6378283 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -705,7 +713,7 @@ CREATE TABLE `vertimiento` (
 /*!50001 SET collation_connection      = utf8mb4_general_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
 /*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `cmg_barra` AS select `v`.`nombre` AS `periodo_datos`,`hm`.`fecha_hora` AS `fecha_hora`,`b`.`nombre` AS `nombre_barra`,`b`.`tension` AS `tension`,`b`.`nombre_cmg` AS `nombre_cmg`,`c`.`CMG_PESO_KWH` AS `CMG_PESO_KWH`,`c`.`CMG_DOLAR_MWH` AS `CMG_DOLAR_MWH` from (((`cmg` `c` join `version` `v` on(`c`.`IdVersion` = `v`.`id_version`)) join `hora_mensual` `hm` on(`c`.`IdVersion` = `hm`.`id_version` and `c`.`id_hora` = `hm`.`id_hora`)) join `barras` `b` on(`c`.`id_barra` = `b`.`id_barra`)) */;
+/*!50001 VIEW `cmg_barra` AS select `v`.`nombre` AS `periodo_datos`,`hm`.`fecha_hora` AS `fecha_hora`,`b`.`nombre` AS `nombre_barra`,`b`.`tension` AS `tension`,`b`.`nombre_cmg` AS `nombre_cmg`,`c`.`CMG_PESO_KWH` AS `CMG_PESO_KWH`,`c`.`CMG_DOLAR_MWH` AS `CMG_DOLAR_MWH` from (((`cmg` `c` join `version` `v` on(`c`.`id_version` = `v`.`id_version`)) join `hora_mensual` `hm` on(`c`.`id_version` = `hm`.`id_version` and `c`.`id_hora` = `hm`.`id_hora`)) join `barras` `b` on(`c`.`id_barra` = `b`.`id_barra`)) */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
@@ -791,4 +799,4 @@ CREATE TABLE `vertimiento` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-03-31 14:26:52
+-- Dump completed on 2026-04-08 17:05:42
