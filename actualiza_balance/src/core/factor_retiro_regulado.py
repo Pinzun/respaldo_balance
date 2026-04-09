@@ -7,7 +7,7 @@ import pandas as pd
 from pymysql.connections import Connection
 from pymysql.cursors import Cursor
 
-from scripts.preflight_utils import PreflightItem, make_result, repo_root
+from actualiza_balance.src.core.preflight_utils import PreflightItem, make_result, repo_root
 
 def preflight_frr(fecha: str, mode: str = "strict"):
     date = pd.to_datetime(fecha)

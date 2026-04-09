@@ -6,7 +6,7 @@ from pathlib import Path
 import pandas as pd
 from pymysql.connections import Connection
 from pymysql.cursors import Cursor
-from scripts.preflight_utils import PreflightItem, make_result, repo_root
+from actualiza_balance.src.core.preflight_utils import PreflightItem, make_result, repo_root
 
 def preflight_precio_estabilizado(fecha: str, tipo: str = "Definitivo", mode: str = "strict"):
     año, numero_mes, periodo, ruta_descarga, ruta_carga = _paths(fecha)

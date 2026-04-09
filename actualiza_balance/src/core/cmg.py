@@ -5,7 +5,7 @@ from pymysql.connections import Connection
 from pymysql.cursors import Cursor
 from pathlib import Path
 import pandas as pd
-from scripts.preflight_utils import PreflightItem, make_result, repo_root
+from actualiza_balance.src.core.preflight_utils import PreflightItem, make_result, repo_root
 import logging
 from typing import Any
 
@@ -131,7 +131,7 @@ def importar_cmg(cx: Connection, cursor: Cursor, fecha: str) -> None:
             `CMg[CLP/KWh]`     DECIMAL(10,5),
             `CMg[USD/MWh]`     DECIMAL(10,5),
             INTERVALO          INT,
-            `Cuarto de Hora`   TINYINT,
+            cuarto_hora        TINYINT,
             nombre_barra_cmg   VARCHAR(50),
             USD                DECIMAL(10,2)
         ) CHARACTER SET utf8mb4;

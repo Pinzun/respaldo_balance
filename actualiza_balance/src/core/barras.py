@@ -6,7 +6,7 @@ from pymysql.connections import Connection
 from pymysql.cursors import Cursor
 from pathlib import Path
 
-from scripts.preflight_utils import PreflightItem, make_result, repo_root
+from actualiza_balance.src.core.preflight_utils import PreflightItem, make_result, repo_root
 
 def preflight_barras(fecha: str, mode: str = "strict"):
     date = pd.to_datetime(fecha)
@@ -93,8 +93,8 @@ def importar_barras(cx: Connection, cursor: Cursor, fecha: str) -> None:
     create_table_query = """ 
         CREATE TABLE IF NOT EXISTS importar.barras_importadas (
         Barra               VARCHAR(50),
-        `Nivel de tensión`  INT,
-        `Barra infotécnica` INT,
+        nivel_tension       INT,
+        id_infotecnica      INT,
         `Código barra CNE`  VARCHAR(50),
         `Nombre barra CNE`  VARCHAR(100),
         Subestacion         VARCHAR(100),

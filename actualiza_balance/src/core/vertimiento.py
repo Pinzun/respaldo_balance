@@ -8,7 +8,7 @@ import pandas as pd
 from pymysql.connections import Connection
 from pymysql.cursors import Cursor
 
-from scripts.preflight_utils import PreflightItem, make_result
+from actualiza_balance.src.core.preflight_utils import PreflightItem, make_result
 
 def preflight_reducciones(fecha: str, mode: str = "strict"):
     ruta_raw, ruta_processed, periodo = _rutas_reducciones(fecha)

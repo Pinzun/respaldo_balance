@@ -6,29 +6,29 @@ from datetime import date
 # -----------------------------
 # Procesamiento + importación
 # -----------------------------
-from scripts.cmg import procesar_cmg, importar_cmg, revisar_cmg, cargar_cmg, preflight_cmg
-from scripts.barras import (
+from actualiza_balance.src.core.cmg import procesar_cmg, importar_cmg, revisar_cmg, cargar_cmg, preflight_cmg
+from actualiza_balance.src.core.barras import (
     procesar_barras,
     importar_barras,
     revisar_barras_info,
     cargar_barras_info,
     preflight_barras,
 )
-from scripts.balance import (
+from actualiza_balance.src.core.balance import (
     procesar_medidas,
     importar_balance,
     revisar_balance,
     cargar_balance,
     preflight_balance,
 )
-from scripts.factor_retiro_regulado import (
+from actualiza_balance.src.core.factor_retiro_regulado import (
     procesar_frr,
     importar_frr,
     revisar_frr,
     cargar_frr,
     preflight_frr,
 )
-from scripts.precio_estabilizado import (
+from actualiza_balance.src.core.precio_estabilizado import (
     procesar_compensacion,
     procesar_inyecciones,
     importar_pe,
@@ -38,13 +38,13 @@ from scripts.precio_estabilizado import (
     cargar_inyecciones,
     preflight_precio_estabilizado,
 )
-from scripts.contratos import (
+from actualiza_balance.src.core.contratos import (
     importar_contratos,
     revisar_contratos,
     cargar_contratos,
     preflight_contratos,
 )
-from scripts.sobrecostos import (
+from actualiza_balance.src.core.sobrecostos import (
     procesar_sobrecostos,
     importar_sobrecostos,
     revisar_sobrecostos,
@@ -58,7 +58,7 @@ from scripts.cv_op import (
     cargar_op,
     preflight_cv_op,
 )
-from scripts.sscc import (
+from actualiza_balance.src.core.sscc import (
     procesar_sscc,
     importar_sscc,
     revisar_sscc,
@@ -80,7 +80,7 @@ from scripts.crea_base_staging import crea_staging
 # -----------------------------
 # DB utils
 # -----------------------------
-from scripts.db_utils import open_connection, close_connection, open_connection_direct, close_connection_direct
+from src.db_utils import open_connection, close_connection, open_connection_direct, close_connection_direct
 
 def run_preflights(fecha: str, tipo: str, mode: str = "skip"):
     """

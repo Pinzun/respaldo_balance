@@ -7,7 +7,7 @@ import pandas as pd
 from pymysql.connections import Connection
 from pymysql.cursors import Cursor
 
-from scripts.preflight_utils import PreflightItem, make_result, repo_root
+from actualiza_balance.src.core.preflight_utils import PreflightItem, make_result, repo_root
 
 def preflight_balance(fecha: str, tipo: str = "Definitivo", mode: str = "strict"):
     date = pd.to_datetime(fecha)
@@ -198,7 +198,7 @@ def importar_balance(
         tension            INT,
         clave              VARCHAR(255),
         nro_lt             VARCHAR(50),
-        `Cuarto de Hora`   INT,
+        cuarto_hora   INT,
         Fecha_Medicion     DATETIME,
         Razon_Social       VARCHAR(255),
         RUT                VARCHAR(20),
