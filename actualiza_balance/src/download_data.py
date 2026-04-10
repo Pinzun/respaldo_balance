@@ -2,7 +2,9 @@
 import zipfile
 from .download.scraper import (
     descargar_balance_energia_plabacom,
-    descargar_balance_sscc_plabacom
+    descargar_balance_sscc_plabacom,
+    descargar_cmg_rango,
+    descargar_politicas_operacion_rango,
 )
 from pathlib import Path
 from datetime import date
