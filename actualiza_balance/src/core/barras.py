@@ -89,24 +89,7 @@ def importar_barras(cx: Connection, cursor: Cursor, fecha: str) -> None:
     print(f"Importando barras (staging) {nombre_mes} {año}...")
     inicio = time.time()
 
-    # 1. Crear tabla si no existe
-    create_table_query = """ 
-        CREATE TABLE IF NOT EXISTS importar.barras_importadas (
-        Barra               VARCHAR(50),
-        nivel_tension       INT,
-        id_infotecnica      INT,
-        `Código barra CNE`  VARCHAR(50),
-        `Nombre barra CNE`  VARCHAR(100),
-        Subestacion         VARCHAR(100),
-        Comuna              VARCHAR(50),
-        Calificacion        VARCHAR(100),
-        `Zona concesión`    VARCHAR(50),
-        `Empresa Propietaria` VARCHAR(255),
-        `Zona Transmisión`  VARCHAR(100)
-    ) CHARACTER SET utf8mb4;
-    """
-    cursor.execute(create_table_query)
-
+    # Truncar tabla (estructura definida en crea_importar.sql)
     cursor.execute("TRUNCATE TABLE importar.barras_importadas;")
 
     query = f"""

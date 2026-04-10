@@ -241,19 +241,7 @@ def importar_sscc(cx: Connection, cursor: Cursor, fecha: str) -> None:
     print(f"Importando sscc {año} {nombre_mes} (staging)...")
     ini = time.time()
 
-    #Crear tabla importar.sscc_rt si no existe 
-    create_table_query = """
-    CREATE TABLE IF NOT EXISTS importar.sscc_rt (
-    concepto   VARCHAR(255) NOT NULL,
-    empresa    VARCHAR(255) NOT NULL,
-    recibe     FLOAT,
-    paga       FLOAT,
-    sen        FLOAT
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-    """
-
-    cursor.execute(create_table_query)
-
+    # Truncar tabla (estructura definida en crea_importar.sql)
     cursor.execute("TRUNCATE TABLE importar.sscc_rt;")
     q1 = f"""
         LOAD DATA LOCAL INFILE '{rt_csv_str}'
@@ -264,18 +252,7 @@ def importar_sscc(cx: Connection, cursor: Cursor, fecha: str) -> None:
     """
     cursor.execute(q1)
 
-    #Crear tabla importar.sscc_infra si no existe
-    create_table_query="""
-    CREATE TABLE IF NOT EXISTS importar.sscc_infra (
-    empresa       VARCHAR(255) NOT NULL,
-    remuneracion  FLOAT,
-    recaudacion   FLOAT,
-    neto          FLOAT
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-    """
-
-    cursor.execute(create_table_query)
-
+    # Truncar tabla (estructura definida en crea_importar.sql)
     cursor.execute("TRUNCATE TABLE importar.sscc_infra;")
     q2 = f"""
         LOAD DATA LOCAL INFILE '{infra_csv_str}'

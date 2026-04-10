@@ -191,34 +191,7 @@ def importar_balance(
     print(f"Importando balance (staging) {nombre_mes} {año}...")
     inicio = time.time()
 
-    # 1. Crear tabla si no existe
-    create_table_query = """ 
-    CREATE TABLE IF NOT EXISTS importar.balance (
-        nombre_barra       VARCHAR(100),
-        tension            INT,
-        clave              VARCHAR(255),
-        nro_lt             VARCHAR(50),
-        cuarto_hora   INT,
-        Fecha_Medicion     DATETIME,
-        Razon_Social       VARCHAR(255),
-        RUT                VARCHAR(20),
-        Nombre_Corto       VARCHAR(100),
-        descripcion        VARCHAR(255),
-        ID_Contrato        VARCHAR(50),
-        tipo               VARCHAR(50),
-        Precio             VARCHAR(50),
-        Zona               VARCHAR(100),
-        medida_1           DECIMAL(25,5),
-        medida_2           DECIMAL(25,5),
-        medida_2a          DECIMAL(25,5),
-        medida_3           DECIMAL(25,5),
-        `CMg[CLP/KWh]`     DECIMAL(20,5),
-        valorizado_CLP     DECIMAL(20,5)
-    ) CHARACTER SET utf8mb4;
-
-    """
-    cursor.execute(create_table_query)
-
+    # Truncar tabla (estructura definida en crea_importar.sql)
     cursor.execute("TRUNCATE TABLE importar.balance;")
 
     for f in (f_norte, f_norte_dx, f_sur, f_sur_dx):

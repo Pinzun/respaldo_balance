@@ -170,18 +170,7 @@ def importar_pe(cx: Connection, cursor: Cursor, fecha: str) -> None:
     iny_norte_csv_str = str(iny_norte_csv).replace("\\", "/")
     iny_sur_csv_str = str(iny_sur_csv).replace("\\", "/")
 
-    #Crear tabla compensacion si no existe
-    create_table_query = """ 
-        CREATE TABLE IF NOT EXISTS importar.compensacion (
-            cuarto_hora          INT NOT NULL,
-            suministrador        VARCHAR(100) NOT NULL,
-            prorrata_suministrador DECIMAL(40,20),
-            diferencia_horaria   DECIMAL(40,20),
-            compensacion         DECIMAL(40,20)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-    """
-    cursor.execute(create_table_query)
-
+    # Truncar tabla (estructura definida en crea_importar.sql)
     cursor.execute("TRUNCATE TABLE importar.compensacion;")
     q1 = f"""
         LOAD DATA LOCAL INFILE '{comp_csv_str}'
@@ -193,28 +182,7 @@ def importar_pe(cx: Connection, cursor: Cursor, fecha: str) -> None:
     cursor.execute(q1)
 
 
-    # Crear tabla inyeccion sino existe
-    create_table_query="""
-        CREATE TABLE IF NOT EXISTS importar.inyecciones (
-        cuarto_hora           INT NOT NULL,
-        clave                 VARCHAR(255) NOT NULL,
-        razon_social          VARCHAR(255),
-        rut                   VARCHAR(20),
-        nombre_corto          VARCHAR(255),
-        descripcion           VARCHAR(255),
-        nombre_barra_cmg      VARCHAR(255),
-        tipo                  VARCHAR(10),
-        precio_pncp           DECIMAL(40,20),
-        medida_1              DECIMAL(40,20),
-        cmg_peso_kwh          DECIMAL(40,20),
-        valorizado_cmg        DECIMAL(40,20),
-        valorizado_pncp       DECIMAL(40,20),
-        diferencia_pncp_cmg   DECIMAL(40,20)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-    
-    """
-    cursor.execute(create_table_query)
-
+    # Truncar tabla (estructura definida en crea_importar.sql)
     cursor.execute("TRUNCATE TABLE importar.inyecciones;")
     q2 = f"""
         LOAD DATA LOCAL INFILE '{iny_norte_csv_str}'

@@ -120,25 +120,7 @@ def importar_cmg(cx: Connection, cursor: Cursor, fecha: str) -> None:
     logging.info(f"Importando cmg (staging) {nombre_mes} {año}...")
     inicio = time.time()
 
-    # 1. Crear tabla si no existe
-    create_table_query = """ 
-        CREATE TABLE IF NOT EXISTS importar.cmg (
-            nombre_barra       VARCHAR(50),
-            tension            INT,
-            FECHA              DATE,
-            HORA               TINYINT,
-            MINUTO             TINYINT,
-            `CMg[CLP/KWh]`     DECIMAL(10,5),
-            `CMg[USD/MWh]`     DECIMAL(10,5),
-            INTERVALO          INT,
-            cuarto_hora        TINYINT,
-            nombre_barra_cmg   VARCHAR(50),
-            USD                DECIMAL(10,2)
-        ) CHARACTER SET utf8mb4;
-    """
-    cursor.execute(create_table_query)
-
-    # 2. Truncar tabla  
+    # Truncar tabla (estructura definida en crea_importar.sql)
     cursor.execute("TRUNCATE TABLE importar.cmg;")
 
     query = f"""

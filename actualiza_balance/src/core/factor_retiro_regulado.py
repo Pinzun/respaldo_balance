@@ -128,24 +128,8 @@ def importar_frr(cx: Connection, cursor: Cursor, fecha: str) -> None:
     inicio = time.time()
 
 
-    # 1. Crear tabla si no existe
-    create_table_query = """ 
-        CREATE TABLE IF NOT EXISTS importar.retiro_regulado (
-            bloque_regulado     VARCHAR(100) NOT NULL,
-            suministrador       VARCHAR(100) NOT NULL,
-            kwh_ps1             FLOAT,
-            porcentaje_ps1      FLOAT,
-            kwh_ps2             FLOAT,
-            porcentaje_ps2      FLOAT,
-            fisico_kwh          FLOAT,
-            monetario           FLOAT
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-    """
-
-    cursor.execute(create_table_query)
-
-
-    cursor.execute("TRUNCATE TABLE importar.retiro_regulado;")
+    # Truncar tabla (estructura definida en crea_importar.sql)
+    cursor.execute("TRUNCATE TABLE importar.retiroregulado;")
 
     query = f"""
         LOAD DATA LOCAL INFILE '{archivo_csv_str}'

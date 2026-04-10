@@ -55,33 +55,7 @@ def importar_contratos(
         raise FileNotFoundError(f"No existe el CSV de contratos esperado: {ruta_csv}")
     archivo_csv_str = str(ruta_csv).replace("\\", "/")
     
-    #Crear la tabla contratos sino existe
-    create_table_query = """
-        CREATE TABLE IF NOT EXISTS importar.contratos (
-        nombre_barra       VARCHAR(255),
-        tension            VARCHAR(50),
-        clave              VARCHAR(255) NOT NULL,
-        nro_lt             VARCHAR(50),
-        cuarto_hora        INT,
-        fecha_medicion     DATETIME,
-        razon_social       VARCHAR(255),
-        rut                VARCHAR(20),
-        nombre_corto       VARCHAR(255),
-        descripcion        VARCHAR(255),
-        id_contrato        INT,
-        tipo               VARCHAR(50),
-        precio             DECIMAL(40,20),
-        zona               VARCHAR(50),
-        medida_1           DECIMAL(40,20),
-        medida_2           DECIMAL(40,20),
-        medida_3           DECIMAL(40,20),
-        cmg_clp_kwh        DECIMAL(40,20),
-        valorizado_clp     DECIMAL(40,20)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-    """
-
-    cursor.execute(create_table_query)
-
+    # Truncar tabla (estructura definida en crea_importar.sql)
     cursor.execute("TRUNCATE TABLE importar.contratos;")
 
     query = f"""

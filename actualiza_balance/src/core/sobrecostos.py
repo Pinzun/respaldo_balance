@@ -140,38 +140,7 @@ def importar_sobrecostos(cx: Connection, cursor: Cursor, fecha: str) -> None:
     print(f"Importando sobrecostos {año} {nombre_mes} (staging)...")
     ini = time.time()
 
-    # Crear tabla importar.cv_importado sino existe
-    create_table_query= """
-         CREATE TABLE IF NOT EXISTS importar.cv_importado (
-        fecha              DATE NOT NULL,
-        hora               INT NOT NULL,
-        central            VARCHAR(255) NOT NULL,
-        cv_usd_mwh         FLOAT
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;    
-    """
-
-    cursor.execute(create_table_query)
-
-    # Crear tabla importar.sobrecostos sino existe
-    create_table_query = """
-        CREATE TABLE IF NOT EXISTS importar.sobrecostos (
-        fecha             DATE NOT NULL,
-        hora              INT NOT NULL,
-        tipo              VARCHAR(50),
-        central           VARCHAR(255) NOT NULL,
-        sobrecosto_clp    FLOAT,
-        zona_pago         VARCHAR(50),
-        gen               FLOAT,
-        cons_propio       FLOAT,
-        cv                FLOAT,
-        cmg               FLOAT,
-        sscc              TEXT
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-    """
-
-    cursor.execute(create_table_query)
-
-
+    # Truncar tablas (estructura definida en crea_importar.sql)
     cursor.execute("TRUNCATE TABLE importar.cv_importado;")
     query1 = f"""
         LOAD DATA LOCAL INFILE '{archivo_cv_csv_str}'
