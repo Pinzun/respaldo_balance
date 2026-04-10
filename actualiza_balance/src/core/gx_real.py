@@ -8,7 +8,7 @@ import pandas as pd
 from pandas import NA
 from rapidfuzz import process, fuzz
 
-from ..db_utils import open_connection, close_connection
+from ..db.db_utils import open_connection, close_connection
 
 
 # =========================

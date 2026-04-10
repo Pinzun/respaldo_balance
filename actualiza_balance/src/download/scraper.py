@@ -8,6 +8,7 @@ from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from urllib.parse import quote, unquote, urlparse
 from calendar import monthrange
+from .scraper.descarga_gx_real import descargar_gx_real 
 
 # --- terceros ---
 import requests
@@ -916,6 +917,11 @@ def main():
     p_op.add_argument("--workers", type=int, default=4)
     p_op.add_argument("--max-suffix", type=int, default=3)
 
+    p_gx = sub.add_parser("gx_real", help="Generación Real (mes)")
+    p_gx.add_argument("--anio",    type=int,  required=True)
+    p_gx.add_argument("--mes",     type=int,  required=True)
+    p_gx.add_argument("--carpeta", type=Path, default=Path("data/gx_real"))
+
     args = p.parse_args()
 
     if args.cmd == "te":
@@ -934,6 +940,9 @@ def main():
         ini = datetime.strptime(args.inicio.strip(), "%Y-%m-%d").date()
         fin = datetime.strptime(args.fin.strip(), "%Y-%m-%d").date()
         descargar_politicas_operacion_rango(ini, fin, args.carpeta, args.workers, args.max_suffix)
+
+    elif args.cmd == "gx_real":
+        descargar_gx_real(args.anio, args.mes, args.carpeta)
 
 if __name__ == "__main__":
     main()

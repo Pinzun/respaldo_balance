@@ -51,13 +51,7 @@ from actualiza_balance.src.core.sobrecostos import (
     cargar_sobrecostos,
     preflight_sobrecostos,
 )
-from scripts.cv_op import (
-    procesar_po,
-    importar_cv_op,
-    revisar_cv_op,
-    cargar_op,
-    preflight_cv_op,
-)
+
 from actualiza_balance.src.core.sscc import (
     procesar_sscc,
     importar_sscc,
@@ -66,21 +60,12 @@ from actualiza_balance.src.core.sscc import (
     preflight_sscc,
 )
 
-# Si cmg_real ya lo tienes operativo, ideal agregarle preflight también.
-from scripts.cmg_real import (
-    procesar_cmg_real,
-    importar_cmg_real,
-    revisar_cmg_real,
-    cargar_cmg_real,
-    preflight_cmg_real,
-)
 
-from scripts.crea_base_staging import crea_staging
 
 # -----------------------------
 # DB utils
 # -----------------------------
-from src.db_utils import open_connection, close_connection, open_connection_direct, close_connection_direct
+from actualiza_balance.src.db.db_utils import open_connection, close_connection, open_connection_direct, close_connection_direct
 
 def run_preflights(fecha: str, tipo: str, mode: str = "skip"):
     """
@@ -96,11 +81,9 @@ def run_preflights(fecha: str, tipo: str, mode: str = "skip"):
         preflight_precio_estabilizado(fecha, tipo, mode=mode),
         preflight_contratos(fecha, tipo, mode=mode),
         preflight_sobrecostos(fecha, mode=mode),
-        preflight_cv_op(fecha, mode=mode),
         preflight_sscc(fecha, tipo, mode=mode),
         # cuando lo integres:
         # preflight_reducciones(fecha, tipo, mode=mode),
-        preflight_cmg_real(fecha, tipo, mode=mode),
     ]
 
     for r in results:
@@ -146,20 +129,10 @@ def part1(conexion, cursor, fecha, tipo, can_run):
     if can_run.get("sobrecostos"):
         procesar_sobrecostos(fecha)
 
-    if can_run.get("cv_op"):
-        procesar_po(fecha)
 
     if can_run.get("sscc"):
         procesar_sscc(fecha, tipo)
 
-    # cmg_real (si no tiene preflight, lo dejamos protegido por can_run)
-    if can_run.get("cmg_real"):
-        procesar_cmg_real(fecha)
-
-    # --- Importación a DB (staging) ---
-
-    # Garantiza la existencia de la base para staging
-    crea_staging(conexion, cursor)
 
     if can_run.get("cmg"):
         importar_cmg(conexion, cursor, fecha)
@@ -182,14 +155,9 @@ def part1(conexion, cursor, fecha, tipo, can_run):
     if can_run.get("sobrecostos"):
         importar_sobrecostos(conexion, cursor, fecha)
 
-    if can_run.get("cv_op"):
-        importar_cv_op(conexion, cursor, fecha)
-
     if can_run.get("sscc"):
         importar_sscc(conexion, cursor, fecha)
 
-    if can_run.get("cmg_real"):
-        importar_cmg_real(conexion, cursor, fecha)
 
     final = time.time()
     print(f"[PART1] Tiempo transcurrido: {time.strftime('%H:%M:%S', time.gmtime(final - inicio))}.")
@@ -233,17 +201,9 @@ def part2(conexion, cursor, fecha, tipo, can_run, do_commit):
         revisar_sobrecostos(cursor)
         cargar_sobrecostos(conexion, cursor, fecha, tipo, do_commit)
 
-    if can_run.get("cv_op"):
-        revisar_cv_op(cursor)
-        cargar_op(conexion, cursor, do_commit)
-
     if can_run.get("sscc"):
         revisar_sscc(cursor)
         cargar_sscc(conexion, cursor, fecha, tipo, do_commit)
-
-    if can_run.get("cmg_real"):
-        revisar_cmg_real(cursor)
-        cargar_cmg_real(conexion, cursor, do_commit)
 
     final = time.time()
     print(f"[PART2] Tiempo transcurrido: {time.strftime('%H:%M:%S', time.gmtime(final - inicio))}.")

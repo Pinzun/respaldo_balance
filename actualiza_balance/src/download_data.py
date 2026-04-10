@@ -1,8 +1,6 @@
 # main_download.py
 import zipfile
-from scraper.scraper import (
-    descargar_politicas_operacion_rango,
-    descargar_cmg_rango,
+from .download.scraper import (
     descargar_balance_energia_plabacom,
     descargar_balance_sscc_plabacom
 )
@@ -45,25 +43,6 @@ def ejecutar_descarga(
     workers = workers
 
     print(f"Iniciando descarga periodo {periodo} ({fecha_inicio} al {fecha_fin})...")
-
-    # 5. Descarga Políticas de Operación
-    descargar_politicas_operacion_rango(
-        inicio=fecha_inicio,
-        fin=fecha_fin,
-        carpeta=download_po_dir,
-        max_workers=workers,
-    )
-    print(f"Descarga de políticas de operación finalizado. Archivos guardados en: {download_po_dir}")
-
-    # 6. Descarga de CMG REAL
-    print(f"Iniciando descarga de CMG real periodo {periodo} ({fecha_inicio} al {fecha_fin})...")
-    descargar_cmg_rango(
-        inicio=fecha_inicio,
-        fin=fecha_fin,
-        carpeta=download_cmg_dir,
-        max_workers=workers,
-    )
-    print(f"Descarga de CMG finalizado. Archivos guardados en: {download_cmg_dir}")
 
     # 7. Descarga balance energía desde Plabacom
     print(f"Iniciando descarga de balance de energía periodo {periodo} ({fecha_inicio} al {fecha_fin})...")

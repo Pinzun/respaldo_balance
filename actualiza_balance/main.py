@@ -2,11 +2,12 @@ import json
 import logging
 from pathlib import Path
 from datetime import date
-from download_data import download_data
-from carga_bd import carga_bd
+from actualiza_balance.src.download_data import download_data
+from actualiza_balance.src.carga_bd import carga_bd
 
 def load_config(config_path: str = "config.json") -> dict:
-    with open(config_path, 'r', encoding='utf-8') as f:
+    path = Path(__file__).resolve().parent / config_path
+    with open(path, 'r', encoding='utf-8') as f:
         return json.load(f)
 
 if __name__ == "__main__":

@@ -11,7 +11,7 @@ try:
     from dotenv import load_dotenv
 
     # Carga .env desde el directorio del proyecto (o ajusta según tu estructura)
-    BASE_DIR = Path(__file__).resolve().parent.parent  # por ejemplo, carpeta raíz del proyecto
+    BASE_DIR = Path(__file__).resolve().parent.parent.parent  # por ejemplo, carpeta raíz del proyecto
     env_path = BASE_DIR / ".env"
     if env_path.exists():
         load_dotenv(env_path)
