@@ -3,8 +3,6 @@ import zipfile
 from .download.scraper import (
     descargar_balance_energia_plabacom,
     descargar_balance_sscc_plabacom,
-    descargar_cmg_rango,
-    descargar_politicas_operacion_rango,
 )
 from pathlib import Path
 from datetime import date
@@ -31,14 +29,10 @@ def ejecutar_descarga(
 
     # 4. Definición de rutas
     base_dir = Path(__file__).resolve().parent
-    download_po_dir = base_dir / "data" / "raw" / "operacion" / str(año) / periodo / "zip"
-    download_cmg_dir = base_dir / "data" / "raw" / "cmg_real" / str(año) / periodo / "zip"
     download_energia_dir = base_dir / "data" / "raw" / "energia" / str(año) / periodo / "zip"
     download_sscc_dir = base_dir / "data" / "raw" / "sscc" / str(año) / periodo / "zip"
 
     # Crear carpetas si no existen
-    download_po_dir.mkdir(parents=True, exist_ok=True)
-    download_cmg_dir.mkdir(parents=True, exist_ok=True)
     download_energia_dir.mkdir(parents=True, exist_ok=True)
 
     # Configuración de hilos (workers)
@@ -913,17 +907,16 @@ def extrae_sscc(
 
 def download_data(fecha_inicio: date, fecha_fin: date, workers: int):
     ejecutar_descarga(fecha_inicio, fecha_fin, workers)
-    extraer_po(fecha_inicio, fecha_fin)
-    extraer_cmg_real(fecha_inicio, fecha_fin)
-    extraer_IT(fecha_inicio, fecha_fin)
-    extrae_sobrecostos(fecha_inicio, fecha_fin)
-    extra_cmg_balance(fecha_inicio, fecha_fin )
+    extraer_po(fecha_inicio)
+    extraer_cmg_real(fecha_inicio)
+    extraer_IT(fecha_inicio)
+    extrae_sobrecostos(fecha_inicio)
+    extra_cmg_balance(fecha_inicio)
     extrae_barras(fecha_inicio)
     extrae_valorizado_pncp(fecha_inicio)
     extra_medidas_valorizadas(fecha_inicio)
     extrae_inyecciones_valorizadas(fecha_inicio)
     extrae_sscc(fecha_inicio)
-
 '''
 if __name__ == "download_data":
     fecha_inicio = date(2025, 10, 1)

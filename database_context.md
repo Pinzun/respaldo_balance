@@ -436,165 +436,284 @@
 
 ---
 
-## 4. Base de datos: `importar_balance` ⚠️ EN CONSTRUCCIÓN
+## 4. Base de datos: `importar_balance` — Staging
 
-> **⚠️ IMPORTANTE:** Esta base de datos está **en construcción activa**. Su estructura, nombres de columnas y tipos de datos pueden cambiar drásticamente en cualquier momento. No debe utilizarse como referencia definitiva para desarrollo ni análisis. La información aquí descrita es meramente orientativa.
+> Estructura derivada de `actualiza_balance/src/db/crea_importar.sql`.  
+> Las tablas de datos se cargan desde CSV mediante los módulos `src/core/`. Las tablas de mapeo se poblan manualmente.
 
-### Tabla: `balance`
+### 4.1 Tablas de datos (cargadas desde CSV)
 
-| Columna | Tipo |
-|---|---|
-| nombre_barra | VARCHAR(100) |
-| tension | INT |
-| clave | VARCHAR(255) |
-| nro_lt | VARCHAR(50) |
-| cuarto_hora | INT |
-| fecha_medicion | DATETIME |
-| razon_social | VARCHAR(255) |
-| rut | VARCHAR(20) |
-| nombre_corto | VARCHAR(100) |
-| descripcion | VARCHAR(255) |
-| id_contrato | VARCHAR(255) |
-| tipo | VARCHAR(50) |
-| precio | VARCHAR(50) |
-| zona | VARCHAR(100) |
-| medida_1 | DECIMAL(25,5) |
-| medida_2 | DECIMAL(25,5) |
-| medida_2a | DECIMAL(25,5) |
-| medida_3 | DECIMAL(25,5) |
-| cmg[clp/KWh] | DECIMAL(20,5) |
-| valorizado_clp | DECIMAL(20,5) |
+---
 
-### Tabla: `barras`
+#### Tabla: `cmg`
 
-| Columna | Tipo |
-|---|---|
-| barra | VARCHAR(50) |
-| nivel_tension | INT |
-| id_infotecnica | INT |
-| id_cne | VARCHAR(50) |
-| nombre_cne | VARCHAR(50) |
-| subestacion | VARCHAR(100) |
-| comuna | VARCHAR(50) |
-| calificacion | VARCHAR(100) |
-| zona_concesion | VARCHAR(50) |
-| empresa_propietaria | VARCHAR(255) |
-| zona_transmision | VARCHAR(100) |
+> Módulo: `src/core/cmg.py` → `procesar_cmg` / `importar_cmg`  
+> CSV: `data/processed/cmg/{YYYY}/{YYMM}/cmg{YYMM}_15min_formateado.csv`  
+> Destino: `balance.cmg`
 
-### Tabla: `cmg`
+| Columna | Tipo | Descripción |
+|---|---|---|
+| nombre_barra | VARCHAR(50) | Nombre de la barra |
+| tension | INT | Nivel de tensión |
+| nombre_barra_cmg | VARCHAR(50) | Nombre de barra usado para CMG |
+| cuarto_hora | INT | Cuarto de hora dentro del mes |
+| cmg_peso_kwh | DECIMAL(10,5) | Costo marginal en CLP/kWh |
+| cmg_dolar_mwh | DECIMAL(10,5) | Costo marginal en USD/MWh |
+| dolar | DECIMAL(10,2) | Valor del dólar en el periodo |
 
-| Columna | Tipo |
-|---|---|
-| nombre_barra | VARCHAR(50) |
-| tension | INT |
-| fecha | DATE |
-| hora | TINYINT |
-| minuto | TINYINT |
-| cmg[clp/kwh] | DECIMAL(10,5) |
-| cmg[usd/kwh] | DECIMAL(10,5) |
-| intervalo | INT |
-| cuarto_hora | TINYINT |
-| nombre_barra_cmg | VARCHAR(50) |
-| usd | DECIMAL(10,2) |
+---
 
-### Tabla: `contratos`
+#### Tabla: `barras_importadas`
 
-| Columna | Tipo |
-|---|---|
-| nombre_barra | VARCHAR(255) |
-| tension | VARCHAR(50) |
-| clave | VARCHAR(255) |
-| nro_lt | VARCHAR(50) |
-| cuarto_hora | INT |
-| fecha_medicion | DATETIME |
-| razon_social | VARCHAR(255) |
-| rut | VARCHAR(50) |
-| nombre_corto | VARCHAR(255) |
-| descripcion | VARCHAR(255) |
-| id_contrato | INT |
-| tipo | VARCHAR(50) |
-| precio | DECIMAL(40,20) |
-| zona | VARCHAR(50) |
-| medida_1 | DECIMAL(40,20) |
-| medida_2 | DECIMAL(40,20) |
-| medida_3 | DECIMAL(40,20) |
-| cmg_clp_kwh | DECIMAL(40,20) |
-| valorizado_clp | DECIMAL(40,20) |
+> Módulo: `src/core/barras.py` → `procesar_barras` / `importar_barras`  
+> CSV: `data/processed/energia/{YYYY}/{YYMM}/{YYMM}_Barras.csv`  
+> Destino: `balance.barra_info`
 
-### Tabla: `retiro_regulado`
+| Columna | Tipo | Descripción |
+|---|---|---|
+| nombre_barra | VARCHAR(50) | Nombre de la barra |
+| tension | INT | Nivel de tensión |
+| barra_infotecnica | INT | ID infotécnica de la barra |
+| codigo_cne | VARCHAR(50) | Código CNE de la barra |
+| nombre_barra_cne | VARCHAR(100) | Nombre CNE de la barra |
+| subestacion | VARCHAR(100) | Nombre de la subestación |
+| comuna | VARCHAR(50) | Comuna donde se ubica |
+| calificacion | VARCHAR(100) | Zona en el sistema de transmisión |
+| zona_concesion | VARCHAR(50) | Zona de concesión |
+| zona_transicion | VARCHAR(100) | Zona de transición |
+| empresa | VARCHAR(255) | Empresa propietaria |
 
-| Columna | Tipo |
-|---|---|
-| bloque_regulado | VARCHAR(100) |
-| suministrador | VARCHAR(100) |
-| kwh_ps1 | FLOAT |
-| porcentaje_ps1 | FLOAT |
-| kwh_ps2 | FLOAT |
-| fisico_kwh | FLOAT |
-| monetario | FLOAT |
+---
 
-### Tabla: `compensacion`
+#### Tabla: `balance`
 
-| Columna | Tipo |
-|---|---|
-| cuarto_hora | INT |
-| suministrador | VARCHAR(100) |
-| prorrata_suministro | DECIMAL(40,20) |
-| diferencia_horaria | DECIMAL(40,20) |
-| compensacion | DECIMAL(40,20) |
+> Módulo: `src/core/balance.py` → `procesar_medidas` / `importar_balance`  
+> CSVs: `{YYMM}_{D/P}_VALORIZADO_NORTE/SUR/NORTE_Dx/SUR_Dx.csv`  
+> Destino: `balance.empresa`, `balance.relacion`, `balance.generacion`, `balance.retiro`, `balance.transmision`
 
-### Tabla: `inyecciones`
+| Columna | Tipo | Descripción |
+|---|---|---|
+| nombre_barra | VARCHAR(100) | Nombre de la barra |
+| tension | INT | Nivel de tensión |
+| clave | VARCHAR(255) | Código representativo de la transacción |
+| nro_lt | VARCHAR(50) | Número de línea de transmisión |
+| cuarto_hora | INT | Cuarto de hora dentro del mes |
+| fecha_medicion | DATETIME | Fecha y hora de la medición |
+| rut | VARCHAR(20) | RUT de la empresa |
+| nombre_corto | VARCHAR(100) | Nombre corto de la empresa |
+| descripcion | VARCHAR(255) | Tipo de punto de medida |
+| id_contrato | VARCHAR(50) | Identificador del contrato |
+| tipo | VARCHAR(50) | Tipo de medición |
+| precio | VARCHAR(50) | Precio aplicado |
+| zona | VARCHAR(100) | Zona del sistema |
+| medida_1 | DECIMAL(25,5) | Energía medida directamente [kWh] |
+| medida_2 | DECIMAL(25,5) | Energía ajustada tras balance zonal [kWh] |
+| cmg_pesos_kwh | DECIMAL(20,5) | Costo marginal en CLP/kWh |
+| valorizado_pesos | DECIMAL(20,5) | Monto valorizado en CLP |
 
-| Columna | Tipo |
-|---|---|
-| cuarto_hora | INT |
-| clave | VARCHAR(255) |
-| razon_social | VARCHAR(255) |
-| rut | VARCHAR(20) |
-| nombre_corto | VARCHAR(255) |
-| descripcion | VARCHAR(255) |
-| nombre_barra_cmg | VARCHAR(255) |
-| tipo | VARCHAR(10) |
-| precio_pncp | DECIMAL(40,20) |
-| medida_1 | DECIMAL(40,20) |
-| cmg_peso_kwh | DECIMAL(40,20) |
-| valorizado_cmg | DECIMAL(40,20) |
-| valorizado_pncp | DECIMAL(40,20) |
-| diferencia_pncp_cmg | DECIMAL(40,20) |
+---
 
-### Tabla: `sobrecostos`
+#### Tabla: `contratos`
 
-| Columna | Tipo |
-|---|---|
-| cuarto_hora | DATE |
-| hora | INT |
-| tipo | VARCHAR(50) |
-| central | VARCHAR(255) |
-| sobrecosto_clp | FLOAT |
-| zona_pago | VARCHAR(50) |
-| gen | FLOAT |
-| cons_propio | FLOAT |
-| cv | FLOAT |
-| cmg | FLOAT |
-| sscc | TEXT |
+> Módulo: `src/core/contratos.py` → `importar_contratos`  
+> CSV: `data/processed/balance/{YYMM}_{D/P}_contratos.csv`  
+> Destino: `balance.c_fin_info`, `balance.c_fin_med`, `balance.c_fis_info`, `balance.c_fis_med`
 
-### Tabla: `sscc_rt`
+| Columna | Tipo | Descripción |
+|---|---|---|
+| nombre_barra | VARCHAR(255) | Nombre de la barra |
+| tension | INT | Nivel de tensión |
+| clave | VARCHAR(255) NOT NULL | Código representativo de la transacción |
+| rut | VARCHAR(20) | RUT de la empresa |
+| nombre_corto | VARCHAR(255) | Nombre corto de la empresa |
+| descripcion | VARCHAR(255) | Descripción del contrato |
+| id_contrato | INT | Identificador del contrato |
+| tipo | VARCHAR(50) | Tipo: `C_FIN` o `C_FIS` |
+| cuarto_hora | INT | Cuarto de hora dentro del mes |
+| medida_1 | DECIMAL(40,20) | Energía del contrato [kWh] |
+| cmg_peso_kwh | DECIMAL(40,20) | Costo marginal en CLP/kWh |
+| valorizado_pesos | DECIMAL(40,20) | Monto valorizado en CLP |
 
-| Columna | Tipo |
-|---|---|
-| concepto | VARCHAR(255) |
-| empresa | VARCHAR(255) |
-| recibe | FLOAT |
-| paga | FLOAT |
-| sen | FLOAT |
+---
 
-### Tabla: `vertimiento`
+#### Tabla: `retiroregulado`
 
-> ⚠️ Nota: en `importar_balance` esta tabla corresponde a SSCC infraestructura (remuneración/recaudación), no a vertimiento de energía renovable como en `balance`.
+> Módulo: `src/core/factor_retiro_regulado.py` → `procesar_frr` / `importar_frr`  
+> CSV: `data/processed/frr/retiroregulado_{YYMM}.csv`  
+> Destino: `balance.retiro_regulado`
 
-| Columna | Tipo |
-|---|---|
-| empresa | VARCHAR(255) |
-| remuneracion | FLOAT |
-| recaudacion | FLOAT |
-| neto | FLOAT |
+| Columna | Tipo | Descripción |
+|---|---|---|
+| bloque_regulado | VARCHAR(100) | Bloque horario regulado (empresa distribuidora) |
+| suministrador | VARCHAR(100) | Empresa suministradora |
+| kwh_ps1 | FLOAT | Energía asignada PS1 [kWh] |
+| `%_ps1` | FLOAT | Porcentaje PS1 respecto al total |
+| kwh_ps2 | FLOAT | Energía asignada PS2 [kWh] |
+| `%_ps2` | FLOAT | Porcentaje PS2 respecto al total |
+| fisico_kwh | FLOAT | Energía física retirada [kWh] |
+| monetario | FLOAT | Monto asociado al retiro [CLP] |
+
+---
+
+#### Tabla: `compensacion`
+
+> Módulo: `src/core/precio_estabilizado.py` → `procesar_compensacion` / `importar_pe`  
+> CSV: `data/processed/precio_estabilizado/{YYMM}_compensacion.csv`  
+> Destino: `balance.pe_compensacion`
+
+| Columna | Tipo | Descripción |
+|---|---|---|
+| hora_mensual | INT | Hora del mes de la medición |
+| suministrador | VARCHAR(100) | Empresa suministradora |
+| prorrata_suministrador | DECIMAL(40,20) | Factor de prorrateo del suministrador |
+| diferencia_horaria | DECIMAL(40,20) | Diferencia entre PNCP y CMG en el periodo |
+| compensacion | DECIMAL(40,20) | Monto de compensación resultante [CLP] |
+
+---
+
+#### Tabla: `inyecciones`
+
+> Módulo: `src/core/precio_estabilizado.py` → `procesar_inyecciones` / `importar_pe`  
+> CSVs: `{YYMM}_inyecciones_norte.csv`, `{YYMM}_inyecciones_sur.csv`  
+> Destino: `balance.pe_inyecciones`
+
+| Columna | Tipo | Descripción |
+|---|---|---|
+| cuarto_hora | INT | Cuarto de hora dentro del mes |
+| clave | VARCHAR(255) | Código representativo de la central |
+| rut | VARCHAR(20) | RUT de la empresa |
+| nombre_corto | VARCHAR(255) | Nombre corto de la empresa |
+| descripcion | VARCHAR(255) | Descripción del punto de inyección |
+| nombre_barra_cmg | VARCHAR(255) | Nombre de barra usado para CMG |
+| tipo | VARCHAR(10) | Tipo de inyección |
+| precio_pncp | DECIMAL(40,20) | Precio nudo a corto plazo [CLP/kWh] |
+| medida_1 | DECIMAL(40,20) | Energía generada [kWh] |
+| cmg_peso_kwh | DECIMAL(40,20) | Costo marginal en CLP/kWh |
+| valorizado_cmg | DECIMAL(40,20) | Valorización a CMG [CLP] |
+| valorizado_pncp | DECIMAL(40,20) | Valorización a precio nudo [CLP] |
+| diferencia_pncp_cmg | DECIMAL(40,20) | Diferencia entre valorización PNCP y CMG [CLP] |
+
+---
+
+#### Tabla: `cv_importado`
+
+> Módulo: `src/core/sobrecostos.py` → `importar_sobrecostos`  
+> CSV: `data/processed/sobrecostos/{YYMM}_costosvariables.csv`  
+> Destino: `balance.cv`
+
+| Columna | Tipo | Descripción |
+|---|---|---|
+| fecha | DATE NOT NULL | Fecha de la medición |
+| hora | INT NOT NULL | Hora del día |
+| unidadgen | VARCHAR(255) NOT NULL | Nombre de la unidad generadora |
+| cv_usd_mwh | FLOAT | Costo variable en USD/MWh |
+
+---
+
+#### Tabla: `sobrecostos`
+
+> Módulo: `src/core/sobrecostos.py` → `importar_sobrecostos`  
+> CSV: `data/processed/sobrecostos/{YYMM}_sobrecostos.csv`  
+> Destino: `balance.sobrecostos`
+
+| Columna | Tipo | Descripción |
+|---|---|---|
+| fecha | DATE NOT NULL | Fecha de la medición |
+| hora | INT NOT NULL | Hora del día |
+| tipo | VARCHAR(50) | Tipo de servicio prestado |
+| unidadgen | VARCHAR(255) NOT NULL | Nombre de la unidad generadora |
+| sobrecosto_clp | FLOAT | Monto del sobrecosto [CLP] |
+| zona_pago | VARCHAR(50) | Zona donde se cobra el sobrecosto |
+| gen | FLOAT | Generación utilizada para el SSCC [kWh] |
+| cons_propio | FLOAT | Consumo propio de la unidad [kWh] |
+| cv | FLOAT | Costo variable del periodo [USD/MWh] |
+| cmg | FLOAT | Costo marginal del periodo [CLP/kWh] |
+| sscc | TEXT | Tipo de servicios complementarios |
+
+---
+
+#### Tabla: `sscc_rt`
+
+> Módulo: `src/core/sscc.py` → `importar_sscc`  
+> CSV: `data/processed/sscc/sscc_rt_{YYMM}.csv`  
+> Destino: `balance.sscc_rt`
+
+| Columna | Tipo | Descripción |
+|---|---|---|
+| concepto | VARCHAR(255) | Clasificación de SSCC por recurso técnico |
+| empresa | VARCHAR(255) | Empresa involucrada |
+| recibe | FLOAT | Monto que recibe la empresa [CLP] |
+| paga | FLOAT | Monto que paga la empresa [CLP] |
+| sen | FLOAT | Diferencia neta (recibe − paga) [CLP] |
+
+---
+
+#### Tabla: `sscc_infra`
+
+> Módulo: `src/core/sscc.py` → `importar_sscc`  
+> CSV: `data/processed/sscc/sscc_infra_{YYMM}.csv`  
+> Destino: `balance.sscc_infra`
+
+| Columna | Tipo | Descripción |
+|---|---|---|
+| empresa | VARCHAR(255) | Empresa involucrada |
+| remuneracion | FLOAT | Monto de remuneración por SSCC infraestructura [CLP] |
+| recaudacion | FLOAT | Monto de recaudación solicitado [CLP] |
+| neto | FLOAT | Diferencia neta (remuneración − recaudación) [CLP] |
+
+---
+
+#### Tabla: `vertimiento`
+
+> Módulo: `src/core/vertimiento.py` → `importar_vertimiento`  
+> CSV: `data/processed/reducciones/Vertimiento_{YYMM}.csv`  
+> Destino: `balance.vertimiento`
+
+| Columna | Tipo | Descripción |
+|---|---|---|
+| central | VARCHAR(255) | Nombre de la central que vierte energía |
+| hora | INT | Hora del día |
+| kwh | FLOAT | Energía vertida [kWh] |
+| fecha | DATE | Fecha del vertimiento |
+| tipo | VARCHAR(50) | Clasificación del tipo de vertimiento |
+
+---
+
+### 4.2 Tablas de mapeo (lookup manuales)
+
+> Se crean vacías y se poblan manualmente fuera del script de inicialización.
+
+| Tabla | PK | Descripción |
+|---|---|---|
+| `empresa2` | `col_7` | Mapea nombre de empresa en archivo fuente → `balance.empresa` |
+| `barra2` | `col_1` | Mapea nombre de barra CMG en archivo fuente → `balance.barras` |
+| `descripcion2` | `col_8` | Mapea descripción de punto de medida → `balance.descripcion` |
+| `unidadgen2` | `central` | Mapea nombre de central en archivo fuente → `balance.unidadgeneracion` |
+
+#### Tabla: `empresa2`
+
+| Columna | Tipo | Descripción |
+|---|---|---|
+| col_7 | VARCHAR(255) NOT NULL PK | Nombre en archivo fuente |
+| nombreempresa | VARCHAR(255) | Nombre oficial en `balance.empresa` |
+
+#### Tabla: `barra2`
+
+| Columna | Tipo | Descripción |
+|---|---|---|
+| col_1 | VARCHAR(255) NOT NULL PK | Nombre CMG en archivo fuente |
+| nombrebarra | VARCHAR(255) | Nombre oficial en `balance.barras` |
+
+#### Tabla: `descripcion2`
+
+| Columna | Tipo | Descripción |
+|---|---|---|
+| col_8 | VARCHAR(255) NOT NULL PK | Descripción en archivo fuente |
+| descripcion | VARCHAR(255) | Descripción oficial en `balance.descripcion` |
+
+#### Tabla: `unidadgen2`
+
+| Columna | Tipo | Descripción |
+|---|---|---|
+| central | VARCHAR(255) NOT NULL PK | Nombre en archivo fuente |
+| central_unidadgeneracion | VARCHAR(255) | Nombre oficial en `balance.unidadgeneracion` |

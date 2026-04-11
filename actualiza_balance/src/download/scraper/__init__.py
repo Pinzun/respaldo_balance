@@ -3,5 +3,3 @@
 from .descarga_gx_real import descargar_gx_real
 from .descarga_balance_energia import descargar_balance_energia_plabacom
 from .descarga_balance_sscc import descargar_balance_sscc_plabacom
-from .descarga_cmg import descargar_cmg_rango
-from .descarga_politicas_operacion import descargar_politicas_operacion_rango
