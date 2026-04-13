@@ -1,4 +1,5 @@
-actualiza_balance/data
+# .gitignore debe tener:
+actualiza_balance/src/data/
 actualiza_balance/.venv/
 actualiza_balance/scraper/__pycache__
 actualiza_balance/scripts/__pycache__
