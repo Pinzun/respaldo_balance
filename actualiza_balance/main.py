@@ -28,6 +28,7 @@ if __name__ == "__main__":
     tipo = config.get("tipo", "Definitivo")
     download = config.get("download", False)
     carga = config.get("carga", False)
+    db_engine = config.get("db_engine", "mysql")
 
     if download:
         logging.info("Iniciando descarga de datos...")
@@ -42,5 +43,6 @@ if __name__ == "__main__":
             server_mode=server_mode,
             dry_run=dry_run,
             part1_exec=part1_exec,
-            part2_exec=part2_exec
+            part2_exec=part2_exec,
+            db_engine=db_engine,
         )

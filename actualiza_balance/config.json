@@ -4,9 +4,10 @@
   "workers": 4,
   "server_mode": "direct",
   "dry_run": true,
-  "part1_exec": false,
-  "part2_exec": true,
+  "part1_exec": true,
+  "part2_exec": false,
   "tipo": "Definitivo",
   "download": true,
-  "carga": true
+  "carga": true,
+  "db_engine": "postgresql"
 }
